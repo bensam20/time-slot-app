@@ -2,28 +2,20 @@ import React, { useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 // import { Calendar } from 'primereact/calendar';
 import { TimePicker } from "antd";
+import { Button } from 'primereact/button';
 
 function TimeSlots() {
   const [timeSlotContainer, setTimeSlotContainer] = useState({
-    Sunday: [
-      { fromTime: "", toTime: "" },
-      { fromTime: "", toTime: "" },
-    ],
+    Sunday: [{ fromTime: "", toTime: "" },],
     Monday: [{ fromTime: "", toTime: "" }],
     Tuesday: [{ fromTime: "", toTime: "" }],
-    Wednesday: [
-      { fromTime: "", toTime: "" },
-      { fromTime: "", toTime: "" },
-    ],
+    Wednesday: [{ fromTime: "", toTime: "" },],
     Thursday: [{ fromTime: "", toTime: "" }],
     Friday: [{ fromTime: "", toTime: "" }],
     Saturday: [{ fromTime: "", toTime: "" }],
   });
 
-  console.log(timeSlotContainer);
-
   const [selectedDays, setSelectedDays] = useState([]);
-  const [time, setTime] = useState({ fromTime: "", toTime: "" });
 
   const onDayChange = (e) => {
     let _selectedDays = [...selectedDays];
@@ -35,10 +27,6 @@ function TimeSlots() {
   };
 
   const onChange = (name, e, day, j) => {
-    setTime({
-      ...time,
-      [name]: e,
-    });
 
     setTimeSlotContainer({
       ...timeSlotContainer,
@@ -52,13 +40,28 @@ function TimeSlots() {
     });
   };
 
+  const addNewTimeSlot = (day) => {
+    setTimeSlotContainer({
+      ...timeSlotContainer,
+      [day]: [...timeSlotContainer?.[day],
+            { fromTime: "", toTime: "" }]
+    })
+  }
+
+  const deleteTimeSlot = (index, day) => {
+    const newArr = timeSlotContainer?.[day].filter((v,i) => {
+      return i!==index
+    })
+    setTimeSlotContainer({
+      ...timeSlotContainer,
+      [day]: newArr
+    })
+  }
+
   return (
     <div>
       <div>
-        {Object.keys(timeSlotContainer).map((day, i) => {
-          // console.log(i);
-          // // console.log(selectedDays);
-          // console.log(timeSlotContainer?.[day]);
+        {Object.keys(timeSlotContainer).map((day, i) => { 
           return (
             <React.Fragment key={i}>
               <div key={day} className="flex align-items-center">
@@ -73,7 +76,7 @@ function TimeSlots() {
                   {day}
                 </label>
               </div>
-              <div>
+              {selectedDays.includes(day) ? <>
                 {timeSlotContainer?.[day].map((v, j) => {
                   return (
                     <React.Fragment key={j}>
@@ -91,11 +94,15 @@ function TimeSlots() {
                         format="HH:mm"
                         minuteStep={15}
                       />
+                      { timeSlotContainer?.[day].length !== 1 ? <Button onClick={() => deleteTimeSlot(j, day)} style={{ margin: "0px 5px", height: "25px"}} icon="pi pi-trash" /> : ""}
+                      { j === timeSlotContainer?.[day].length - 1 ? <><Button onClick={() => addNewTimeSlot(day)} style={{height: "25px"}} icon="pi pi-plus" /></> : "" }
                       <br />
                     </React.Fragment>
                   );
                 })}
-              </div>
+
+              </>
+              : ""}
             </React.Fragment>
           );
         })}
