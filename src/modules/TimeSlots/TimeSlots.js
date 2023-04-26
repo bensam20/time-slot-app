@@ -3,6 +3,7 @@ import { Checkbox } from "primereact/checkbox";
 // import { Calendar } from 'primereact/calendar';
 import { TimePicker } from "antd";
 import { Button } from 'primereact/button';
+import moment from 'moment';
 
 function TimeSlots() {
   const [timeSlotContainer, setTimeSlotContainer] = useState({
@@ -16,6 +17,7 @@ function TimeSlots() {
   });
 
   const [selectedDays, setSelectedDays] = useState([]);
+  const [fromTime, setFromTime] = useState();
 
   const onDayChange = (e) => {
     let _selectedDays = [...selectedDays];
@@ -25,6 +27,24 @@ function TimeSlots() {
 
     setSelectedDays(_selectedDays);
   };
+
+  const handleDisabledHours = () => {
+    const selectedHour = fromTime.hour();
+    const disabledHours = [];
+    for (let i = 0; i < selectedHour; i++) {
+      disabledHours.push(i);
+    }
+    return disabledHours;
+  }
+
+  const handleDisabledMinutes = () => {
+    const selectedMinute = fromTime.minute();
+    const disabledMinute = [];
+    for (let i = 0; i < selectedMinute; i++) {
+      disabledMinute.push(i);
+    }
+    return disabledMinute;
+  }
 
   const onChange = (name, e, day, j) => {
 
@@ -38,6 +58,7 @@ function TimeSlots() {
         }
       }),
     });
+    setFromTime(e);
   };
 
   const addNewTimeSlot = (day) => {
@@ -57,6 +78,29 @@ function TimeSlots() {
       [day]: newArr
     })
   }
+
+  const RangeDisabledTime = (
+    now,
+    type
+  ) => ({
+    disabledHours: () => {
+      const selectedHour = fromTime.hour();
+      const disabledHours = [];
+      for (let i = 0; i < selectedHour; i++) {
+        disabledHours.push(i);
+      }
+      return disabledHours;
+    },
+    disabledMinutes: (selectedHour) => {
+      console.log(selectedHour)
+      const selectedMinute = selectedHour === fromTime.hour() ? fromTime.minute(): 0;
+      const disabledMinute = [];
+      for (let i = 0; i < selectedMinute; i++) {
+        disabledMinute.push(i);
+      }
+      return disabledMinute;
+    }
+  });
 
   return (
     <div>
@@ -91,6 +135,9 @@ function TimeSlots() {
                         name="toTime"
                         value={v.toTime}
                         onChange={(e) => onChange("toTime", e, day, j)}
+                        // disabledHours={handleDisabledHours}
+                        // disabledMinutes={handleDisabledMinutes}
+                        disabledTime={RangeDisabledTime}
                         format="HH:mm"
                         minuteStep={15}
                       />
